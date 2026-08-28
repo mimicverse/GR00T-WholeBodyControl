@@ -77,6 +77,16 @@ try:
 except ImportError:
     xrt = None
 
+
+def _start_pico_service() -> None:
+    """Start the official PC Service from a system or user-level install."""
+    service_script = os.environ.get(
+        "XROBO_SERVICE_SCRIPT", "/opt/apps/roboticsservice/runService.sh"
+    )
+    if not os.path.isfile(service_script):
+        raise RuntimeError(f"XRoboToolkit PC Service is missing: {service_script}")
+    subprocess.Popen(["bash", service_script])
+
 try:
     from gear_sonic.utils.teleop.solver.hand.g1_gripper_ik_solver import (
         G1GripperInverseKinematicsSolver,
@@ -363,7 +373,7 @@ def run_vr3pt_live_visualizer():
     print("=" * 60)
 
     # Initialize XRT
-    subprocess.Popen(["bash", "/opt/apps/roboticsservice/runService.sh"])
+    _start_pico_service()
     xrt.init()
     print("Waiting for body tracking data...")
     while not xrt.is_body_data_available():
@@ -413,7 +423,7 @@ def run_vr3pt_realtime_visualizer(update_hz: int = 10):
     print("=" * 60)
 
     # Initialize XRT
-    subprocess.Popen(["bash", "/opt/apps/roboticsservice/runService.sh"])
+    _start_pico_service()
     xrt.init()
     print("Waiting for body tracking data...")
     while not xrt.is_body_data_available():
@@ -1523,6 +1533,12 @@ class PoseStreamer:
                 "right_grip": np.array([right_grip], dtype=np.float32),
                 "pico_dt": np.array([pico_dt], dtype=np.float32),
                 "pico_fps": np.array([pico_fps], dtype=np.float32),
+                # Preserve the XR device clock for interval/drift analysis.  This
+                # timestamp is not directly comparable with another host's clock;
+                # cross-host one-way latency still requires clock calibration.
+                "pico_timestamp_ns": np.array(
+                    [sample.get("timestamp_ns", 0)], dtype=np.int64
+                ),
                 "timestamp_realtime": np.array(
                     [sample.get("timestamp_realtime", 0.0)], dtype=np.float64
                 ),
@@ -1584,14 +1600,15 @@ def _init_input_source(
             "XRoboToolkit SDK not available. Install xrobotoolkit_sdk to run Pico streaming."
         )
 
-    subprocess.Popen(["bash", "/opt/apps/roboticsservice/runService.sh"])
+    _start_pico_service()
     xrt.init()
     print("Waiting for body tracking data...")
     while not xrt.is_body_data_available():
         print("waiting for body data...")
         time.sleep(1)
 
-    reader = PicoReader(max_queue_size=buffer_size)
+    # Reuse the shared reader, which detects missing/stale XRT timestamps.
+    reader = input_readers.PicoReader(max_queue_size=buffer_size)
     reader.start()
     return reader
 
@@ -1991,6 +2008,17 @@ def run_pico_manager(
         prev_start_combo = False
         prev_left_axis_click = False
         while True:
+            # Fail closed if an active PICO stream stops advancing.  In OFF mode
+            # simply wait for fresh tracking so stale controller buttons cannot
+            # start the policy; in any active mode send the official STOP packet.
+            if reader.disconnected:
+                if current_mode != StreamMode.OFF:
+                    socket.send(build_command_message(start=False, stop=True, planner=True))
+                    print("[Manager] PICO tracking lost: STOP sent, exiting")
+                    break
+                time.sleep(0.05)
+                continue
+
             # Poll Pico controller for buttons/axes
             a_pressed, b_pressed, x_pressed, y_pressed = get_abxy_buttons(reader)
 
