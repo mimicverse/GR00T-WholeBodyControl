@@ -195,6 +195,11 @@ SONIC supports real-time whole-body teleoperation via PICO VR headset, enabling 
 
 This repo can also drive the headset over Isaac Teleop / CloudXR by launching `gear_sonic/scripts/pico_manager_thread_server.py --input-source isaac-teleop`. The streamer hosts the CloudXR runtime in-process via `isaacteleop[cloudxr]` — no separate publisher container required. That path is currently documented and supported only for **G1 with a Thor backpack**. The Isaac Teleop bring-up steps are documented in [`docs/source/tutorials/isaac_teleop_publisher_setup.md`](docs/source/tutorials/isaac_teleop_publisher_setup.md).
 
+For the isolated split-host PICO setup—local MuJoCo viewer and XR tracking with
+GPU-only SONIC v1.1 inference on a second machine—see the
+[Chinese deployment runbook](docs/PICO_SONIC_WBC_MUJOCO_ZH.md) and
+[reproducible changeset guide](docs/PICO_SONIC_CHANGESET_AND_REPRODUCIBILITY_ZH.md).
+
 <div align="center">
 <table>
 <tr>
