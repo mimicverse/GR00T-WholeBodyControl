@@ -199,7 +199,11 @@ set(EXE_LIBS
 
 # build the main executable:
 add_executable(${EXECUTABLE_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/g1_deploy_onnx_ref.cpp)
-target_include_directories(${EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(${EXECUTABLE_NAME} PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/
+  ${PROJECT_SOURCE_DIR}/src
+  # output_interface.hpp uses msgpack even when ROS 2 is disabled.
+  ${MSGPACK_INCLUDE_DIRS})
 
 target_link_directories(${EXECUTABLE_NAME} PRIVATE ${CUDA_LINK_DIRS})
 target_link_libraries(

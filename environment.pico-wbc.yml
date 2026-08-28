@@ -1,0 +1,35 @@
+name: groot-wbc-pico
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.10.21
+  - pip=25.1.1
+  # Keep build tooling in Conda so the native XRobotoolkit binding is
+  # reproducible and does not depend on a system CMake installation.
+  - cmake=3.31.6
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cpu
+      - torch==2.4.1+cpu
+      - pybind11==2.13.6
+      - numpy==1.26.4
+      - scipy==1.15.3
+      - mujoco==3.2.7
+      - pyyaml==6.0.2
+      - pyzmq==26.4.0
+      - msgpack==1.1.0
+      - msgpack-numpy==0.4.8
+      - opencv-python==4.11.0.86
+      - cyclonedds==0.10.2
+      - onnxruntime==1.19.2
+      - pynput==1.7.7
+      - pytest==8.3.5
+      - pin==2.6.21
+      - tyro==0.9.19
+      - easydict==1.13
+      - joblib==1.4.2
+      - loguru==0.7.3
+      - tqdm==4.67.1
+      - huggingface_hub==0.30.2
+      - -e ./gear_sonic
+      - -e ./external_dependencies/unitree_sdk2_python

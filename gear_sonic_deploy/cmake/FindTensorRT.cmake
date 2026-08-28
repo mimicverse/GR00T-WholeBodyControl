@@ -28,7 +28,10 @@
 # ~~~
 
 if(NOT TensorRT_FIND_COMPONENTS)
-  set(TensorRT_FIND_COMPONENTS nvinfer nvinfer_plugin nvonnxparser nvparsers)
+  # TensorRT 10 removed the legacy nvparsers library.  It is not used by
+  # this deployment (the ONNX parser is provided by nvonnxparser), so keep it
+  # out of the default component list and remain compatible with TRT 8/9.
+  set(TensorRT_FIND_COMPONENTS nvinfer nvinfer_plugin nvonnxparser)
 endif()
 set(TensorRT_LIBRARIES)
 
@@ -113,4 +116,3 @@ endforeach()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(TensorRT HANDLE_COMPONENTS VERSION_VAR TensorRT_VERSION REQUIRED_VARS TensorRT_INCLUDE_DIR)
-

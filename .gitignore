@@ -176,6 +176,7 @@ huggingface/
 *.ckpt
 *.safetensors
 *.engine
+*.trt
 !decoupled_wbc/sim2mujoco/resources/robots/g1/policy/GR00T-WholeBodyControl-Balance.onnx
 !decoupled_wbc/sim2mujoco/resources/robots/g1/policy/GR00T-WholeBodyControl-Walk.onnx
 !motionbricks/out/**/*.ckpt
@@ -212,6 +213,10 @@ sonic_release/
 # Training output logs
 logs_rl/
 logs_eval/
+
+# Local PICO/SONIC runs and machine-specific split-host configuration.
+/logs/
+/config/pico_wbc_split.env
 
 # Model checkpoints directory
 models/
