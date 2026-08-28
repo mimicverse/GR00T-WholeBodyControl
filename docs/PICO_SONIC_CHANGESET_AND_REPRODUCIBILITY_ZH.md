@@ -116,6 +116,12 @@ cp config/pico_wbc_split.env.example config/pico_wbc_split.env
 在两台机器的私有配置中填写实际 `WBC_HOST`、`SIM_HOST_IP`、`REMOTE_USER` 和
 `REMOTE_REPO`。端口默认使用 5556、5557、5560、5561。
 
+本机可在人工网络/SSH 检查前加载这些值：
+
+```bash
+set -a; source config/pico_wbc_split.env; set +a
+```
+
 ### 4.2 本机安装
 
 要求 Ubuntu 22.04 x86_64、已有 Miniforge/Conda、PICO 和本机处于同一局域网：
@@ -165,6 +171,9 @@ PICO 应用设为 `WORKING`、Head/Controller Send、Motion Tracker Full body，
 ```bash
 ./scripts/start_pico_sonic_mujoco.sh
 ```
+
+一键脚本会先检查本机 Conda 环境和 43-DoF XML，并在同一次 SSH 内执行远端
+`run_remote_sonic_wbc.sh --check`；任一门禁失败都会停止并清理本地子进程。
 
 看到远端 `Init Done` 后依次：A+B+X+Y、MuJoCo 窗口按 `9`、PLANNER 独立站稳、
 最后 A+X 进入 POSE。正式实验入口：

@@ -65,6 +65,8 @@ PY
 `groot-wbc-sonic-trt1013`，不得安装到系统 Python：
 
 ```bash
+cd "$HOME/Work/GR00T-WholeBodyControl"
+set -a; source config/pico_wbc_split.env; set +a
 ssh "${REMOTE_USER}@${WBC_HOST}"
 cd "$HOME/Work/GR00T-WholeBodyControl"
 ./scripts/setup_remote_sonic_env.sh
@@ -184,6 +186,7 @@ XRoboToolkit body frame 是 `(24, 7)`：`[x,y,z,qx,qy,qz,qw]`。位置为米，�
 ```bash
 cp config/pico_wbc_split.env.example config/pico_wbc_split.env
 # 编辑 WBC_HOST、SIM_HOST_IP、REMOTE_USER、REMOTE_REPO
+set -a; source config/pico_wbc_split.env; set +a
 ```
 
 ```bash
@@ -224,7 +227,8 @@ cd "$HOME/Work/GR00T-WholeBodyControl"
 
 1. 读取 `config/pico_wbc_split.env`；
 2. 在本机启动 MuJoCo viewer、PICO manager 和 sim bridge；
-3. SSH 到 `${REMOTE_USER}@${WBC_HOST}` 启动远端 SONIC/TensorRT WBC 和 WBC bridge；
+3. 通过同一次 SSH 先执行远端 `--check`，验证 TensorRT/CUDA/模型/二进制，再启动
+   SONIC/TensorRT WBC 和 WBC bridge；
 4. 在终端显示完整远端输出，并把两端日志汇总到
    `logs/pico_wbc_split/orchestrator-<timestamp>/`；
 5. Ctrl+C、远端退出或 PICO 失联 STOP 后统一清理本地子进程。
@@ -264,6 +268,8 @@ set -a; source config/pico_wbc_split.env; set +a
 ### 终端 B：4090 主机
 
 ```bash
+cd "$HOME/Work/GR00T-WholeBodyControl"
+set -a; source config/pico_wbc_split.env; set +a
 ssh "${REMOTE_USER}@${WBC_HOST}"
 cd "$HOME/Work/GR00T-WholeBodyControl"
 set -a; source config/pico_wbc_split.env; set +a
